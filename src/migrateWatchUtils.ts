@@ -56,13 +56,28 @@ export default (fileInfo, api) => {
             case "init":
               name = "watch";
               break;
+            case "when":
+              name = "when";
+              break;
+            case "whenOnce":
+              name = "when";
+              break;
             case "whenNot":
+              name = "when";
+              break;
+            case "whenNotOnce":
               name = "when";
               break;
             case "whenTrue":
               name = "when";
               break;
             case "whenTrueOnce":
+              name = "when";
+              break;
+            case "whenFalse":
+              name = "when";
+              break;
+            case "whenFalseOnce":
               name = "when";
               break;
             case "whenDefined":
@@ -72,6 +87,9 @@ export default (fileInfo, api) => {
               name = "when";
               break;
             case "whenUndefined":
+              name = "when";
+              break;
+            case "whenUndefinedOnce":
               name = "when";
               break;
           }
@@ -210,7 +228,12 @@ export default (fileInfo, api) => {
      const convertAllWhenFunction = () => {
 
       const whenReplaceFunc = (
-        whenType: "when"|"whenNot"|"whenTrue"|"whenDefined"|"whenUndefined", 
+        whenType: "when"
+        | "whenNot"
+        | "whenTrue"
+        | "whenFalse"
+        | "whenDefined"
+        | "whenUndefined",
         isOnce: boolean,
         nodePath
       ) => {
@@ -232,6 +255,8 @@ export default (fileInfo, api) => {
               ? j.identifier(paths.map((path)=>`!${path}`).join(" || "))
             : whenType === "whenTrue"
               ? j.identifier(paths.map((path)=>`${path} === true`).join(" || "))
+            : whenType === "whenFalse"
+              ? j.identifier(paths.map((path)=>`${path} === false`).join(" || "))
             : whenType === "whenDefined"
               ? j.identifier(paths.map((path)=>`${path} !== undefined`).join(" || "))
             : whenType === "whenUndefined"
@@ -239,15 +264,20 @@ export default (fileInfo, api) => {
             : j.identifier(paths.join(" || ")) // default
           ),
           node.arguments[2],
-          isOnce ? 
           j.objectExpression([
+            (isOnce ? 
             j.property(
               "init",
               j.identifier("once"),
               j.literal(true)
             )
-          ])
-          : null
+            : null) as any,
+            j.property(
+              "init",
+              j.identifier("initial"),
+              j.literal(true)
+            )
+          ].filter((val)=>val != null))
         ];
 
         node.arguments = newArgs;
@@ -302,6 +332,22 @@ export default (fileInfo, api) => {
             name: "whenTrueOnce"
           },
         }).replaceWith(whenReplaceFunc.bind(this, "whenTrue", true));
+
+        root
+        .find(j.CallExpression, {
+          callee: {
+            type: "Identifier",
+            name: "whenFalse"
+          },
+        }).replaceWith(whenReplaceFunc.bind(this, "whenFalse", false));
+
+      root
+        .find(j.CallExpression, {
+          callee: {
+            type: "Identifier",
+            name: "whenFalseOnce"
+          },
+        }).replaceWith(whenReplaceFunc.bind(this, "whenFalseOnce", true));
 
       root
         .find(j.CallExpression, {

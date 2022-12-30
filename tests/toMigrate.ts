@@ -1,82 +1,90 @@
 
-// // Scenario 1 ---- General Watch
+// Scenario 1 ---- General Watch
 
-// import { watch } from "esri/core/watchUtils";
+import { watch } from "esri/core/reactiveUtils";
 
-// watch(foo, "some.value", (newValue, oldValue) => {
-//   console.log(newValue, oldValue);
-// });
-
-// watch(this.foo, "some.value", (newValue, oldValue) => {
-//   console.log(newValue, oldValue);
-// });
-
-
-// // Scenario 2 ---- Init
-
-// import { init } from "esri/core/watchUtils";
-
-// init(foo, "some.value", (newValue, oldValue) => {
-//   console.log(newValue, oldValue);
-// });
-
-
-// // Scenario 3 ---- When
-
-// import { when, whenNot, whenTrue, whenDefined, whenUndefined } from "esri/core/watchUtils";
-
-// when(foo, "some.value", () => console.log("Truthy"));
-// when(this, ["value1", "value2"], () => {
-//   this.scheduleRender();
-// }),
-// whenNot(foo, "some.value", () => console.log("Not truthy"));
-// whenTrue(foo, "some.value", () => console.log("True"));
-// whenDefined(foo, "some.value", () => console.log("Defined"));
-// whenUndefined(foo, "some.value", () => console.log("Undefined"));
-
-
-// // Scenario 4 ---- once
-
-// import { once } from "esri/core/watchUtils";
-
-// const handle = once(foo, "some.value");
-
-// handle.then(({ value }) => {
-//   console.log(value);
-// });
-
-// handle.remove(); // Stop watching and clean up
-
-
-// // Scenario 5 ---- whenOnce
-
-// import { whenOnce } from "esri/core/watchUtils";
-
-// const handleWhenOnce = whenOnce(foo, "some.value");
-
-// handleWhenOnce.then(() => {
-//   console.log("Became truthy!");
-// });
-
-// handleWhenOnce.remove(); // Stop watching and clean up
-
-
-
-when(() => this?.itemLoaderVM?.isItemLoaderDone === true, () => {
-  switch (this.itemLoaderVM.loadedItemType) {
-    case "webmap":
-      this._handleWebmap(dom);
-      break;
-    case "webscene":
-      this._handleWebscene(dom);
-      break;
-    case "group":
-      this._handleGroup(dom);
-      break;
-    case "none":
-      this._handleNoLoadedItem(dom);
-      break;
-  }
-}, {
-  once: true
+watch(() => foo?.some?.value, (newValue, oldValue) => {
+  console.log(newValue, oldValue);
 });
+
+watch(() => this?.foo?.some?.value, (newValue, oldValue) => {
+  console.log(newValue, oldValue);
+});
+
+
+// Scenario 2 ---- Init
+
+import { watch } from "esri/core/reactiveUtils";
+
+watch(() => foo?.some?.value, (newValue, oldValue) => {
+  console.log(newValue, oldValue);
+}, {
+  initial: true
+});
+
+
+// Scenario 3 ---- When
+
+import { when } from "esri/core/reactiveUtils";
+
+when(() => foo?.some?.value, () => console.log("Truthy"), {
+  initial: true
+});
+when(() => this?.navBar || this?.contentArea, () => {
+  this.scheduleRender();
+}, {
+  initial: true
+}),
+when(() => !foo?.some?.value, () => console.log("Not truthy"), {
+  initial: true
+});
+when(() => foo?.some?.value === true, () => console.log("True"), {
+  initial: true
+});
+when(() => foo?.some?.value === true, () => console.log("TrueOnce"), {
+  once: true,
+  initial: true
+});
+when(() => foo?.some?.value === false, () => console.log("False"), {
+  initial: true
+});
+when(() => foo?.some?.value, () => console.log("FalseOnce"), {
+  once: true,
+  initial: true
+});
+when(() => foo?.some?.value !== undefined, () => console.log("Defined"), {
+  initial: true
+});
+when(() => foo?.some?.value === undefined, () => console.log("Undefined"), {
+  initial: true
+});
+
+
+// Scenario 4 ---- once
+
+import { once } from "esri/core/reactiveUtils";
+
+const handle = once(foo, "some.value");
+
+handle.then(({ value }) => {
+  console.log(value);
+});
+
+handle.remove(); // Stop watching and clean up
+
+
+// Scenario 5 ---- whenOnce
+
+import { when } from "esri/core/reactiveUtils";
+
+const handleWhenOnce = when(() => foo?.some?.value, , {
+  once: true,
+  initial: true
+});
+
+handleWhenOnce.then(() => {
+  console.log("Became truthy!");
+});
+
+handleWhenOnce.remove(); // Stop watching and clean up
+

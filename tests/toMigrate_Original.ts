@@ -31,6 +31,9 @@ when(this, ["navBar", "contentArea"], () => {
 }),
 whenNot(foo, "some.value", () => console.log("Not truthy"));
 whenTrue(foo, "some.value", () => console.log("True"));
+whenTrueOnce(foo, "some.value", () => console.log("TrueOnce"));
+whenFalse(foo, "some.value", () => console.log("False"));
+whenFalseOnce(foo, "some.value", () => console.log("FalseOnce"));
 whenDefined(foo, "some.value", () => console.log("Defined"));
 whenUndefined(foo, "some.value", () => console.log("Undefined"));
 
